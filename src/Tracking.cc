@@ -185,6 +185,7 @@ Tracking::Tracking(
 
     // 在单目初始化的时候，会用mpIniORBextractor来作为特征点提取器
     if(sensor==System::MONOCULAR)
+        ///ORBextractor类的构造完成了金字塔层数调整、计算每层特征点数量、保存描述子pattern、计算灰度质心圆
         mpIniORBextractor = new ORBextractor(2*nFeatures,fScaleFactor,nLevels,fIniThFAST,fMinThFAST);
 
     cout << endl  << "ORB Extractor Parameters: " << endl;
@@ -880,7 +881,7 @@ void Tracking::MonocularInitialization()
         if(mCurrentFrame.mvKeys.size()>100)
         {
             // 初始化需要两帧，分别是mInitialFrame，mCurrentFrame
-            mInitialFrame = Frame(mCurrentFrame);
+            mInitialFrame = Frame(mCurrentFrame);///这里是创建了初始化帧，供后边进行匹配使用
             // 用当前帧更新上一帧
             mLastFrame = Frame(mCurrentFrame);
             // mvbPrevMatched  记录"上一帧"所有特征点
@@ -928,7 +929,7 @@ void Tracking::MonocularInitialization()
             mInitialFrame,mCurrentFrame,    //初始化时的参考帧和当前帧
             mvbPrevMatched,                 //在初始化参考帧中提取得到的特征点
             mvIniMatches,                   //保存匹配关系
-            100);                           //搜索窗口大小
+            100);                           //搜索窗口大小（建立匹配关系特征点间距）
 
         // Check if there are enough correspondences
         // Step 4 验证匹配结果，如果初始化的两帧之间的匹配点太少，重新初始化
@@ -954,7 +955,7 @@ void Tracking::MonocularInitialization()
             // Step 6 初始化成功后，删除那些无法进行三角化的匹配点
             for(size_t i=0, iend=mvIniMatches.size(); i<iend;i++)
             {
-                if(mvIniMatches[i]>=0 && !vbTriangulated[i])
+                if(mvIniMatches[i]>=0 && !vbTriangulated[i])//左边判断是>=0，是因为之前初始化为-1了都，所以总的来说左边说明建立了匹配，右边判断说明没有实现三角化
                 {
                     mvIniMatches[i]=-1;
                     nmatches--;
@@ -985,7 +986,7 @@ void Tracking::MonocularInitialization()
  */
 void Tracking::CreateInitialMapMonocular()
 {
-    // Create KeyFrames 认为单目初始化时候的参考帧和当前帧都是关键帧
+    // Create KeyFrames 认为单目初始化时候的参考帧和当前帧都是关键帧（初始化时，传入了位姿信息以及特征点网格索引）
     KeyFrame* pKFini = new KeyFrame(mInitialFrame,mpMap,mpKeyFrameDB);  // 第一帧
     KeyFrame* pKFcur = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);  // 第二帧
 
@@ -1042,7 +1043,7 @@ void Tracking::CreateInitialMapMonocular()
         mCurrentFrame.mvpMapPoints[mvIniMatches[i]] = pMP;
         mCurrentFrame.mvbOutlier[mvIniMatches[i]] = false;
 
-        //Add to Map
+        ///Add to Map
         mpMap->AddMapPoint(pMP);
     }
 
@@ -1127,7 +1128,7 @@ void Tracking::CreateInitialMapMonocular()
  */
 void Tracking::CheckReplacedInLastFrame()
 {
-    for(int i =0; i<mLastFrame.N; i++)
+    for(int i = 0; i<mLastFrame.N; i++)
     {
         MapPoint* pMP = mLastFrame.mvpMapPoints[i];
         //如果这个地图点存在

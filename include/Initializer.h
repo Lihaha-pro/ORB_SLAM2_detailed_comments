@@ -281,11 +281,11 @@ private:
 
 
     // Keypoints from Reference Frame (Frame 1)
-    /** 存储Reference Frame中的特征点 */
+    /** 存储Reference Frame中的特征点 用于初始化建立匹配 */
     vector<cv::KeyPoint> mvKeys1; 
 
     // Keypoints from Current Frame (Frame 2)
-    /** 存储Current Frame中的特征点 */
+    /** 存储Current Frame中的特征点 用于初始化建立匹配 */
     vector<cv::KeyPoint> mvKeys2; 
 
     // Current Matches from Reference to Current

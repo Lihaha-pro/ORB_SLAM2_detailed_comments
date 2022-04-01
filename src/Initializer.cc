@@ -62,7 +62,7 @@ Initializer::Initializer(const Frame &ReferenceFrame, float sigma, int iteration
     mSigma2 = sigma*sigma;
 
 	//最大迭代次数
-    mMaxIterations = iterations;
+    mMaxIterations = iterations;//200次
 }
 
 
@@ -103,7 +103,7 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     mvbMatched1.resize(mvKeys1.size());
 
     // Step 1 重新记录特征点对的匹配关系存储在mvMatches12，是否有匹配存储在mvbMatched1
-    // 将vMatches12（有冗余） 转化为 mvMatches12（只记录了匹配关系）
+    // 将vMatches12（有冗余） 转化为 mvMatches12（只记录了匹配关系）//llh这个操作很有趣嗷
     for(size_t i=0, iend=vMatches12.size();i<iend; i++)
     {
 		//vMatches12[i]解释：i表示帧1中关键点的索引值，vMatches12[i]的值为帧2的关键点索引值
@@ -147,6 +147,7 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     DUtils::Random::SeedRandOnce(0);
 
 	//开始每一次的迭代 
+    //llh:这里实际上是填充了mvSets矩阵，用于后边求解
     for(int it=0; it<mMaxIterations; it++)
     {
 		//迭代开始的时候，所有的点都是可用的

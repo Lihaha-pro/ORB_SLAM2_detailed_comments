@@ -388,7 +388,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     //计算 basline
     mb = mbf/fx;
 
-	// 将特征点分配到图像网格中 
+	// Step 6 将特征点分配到图像网格中 常用的是将图片分成64*48个网格
     AssignFeaturesToGrid();
 }
 
@@ -416,7 +416,7 @@ void Frame::AssignFeaturesToGrid()
 		//存储某个特征点所在网格的网格坐标，nGridPosX范围：[0,FRAME_GRID_COLS], nGridPosY范围：[0,FRAME_GRID_ROWS]
         int nGridPosX, nGridPosY;
 		// 计算某个特征点所在网格的网格坐标，如果找到特征点所在的网格坐标，记录在nGridPosX,nGridPosY里，返回true，没找到返回false
-        if(PosInGrid(kp,nGridPosX,nGridPosY))
+        if(PosInGrid(kp,nGridPosX,nGridPosY))///去掉那些去畸变后跑到图像边界外的点
 			//如果找到特征点所在网格坐标，将这个特征点的索引添加到对应网格的数组mGrid中
             mGrid[nGridPosX][nGridPosY].push_back(i);
     }
@@ -578,7 +578,7 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
 }
 
 /**
- * @brief 找到在 以x,y为中心,半径为r的圆形内且金字塔层级在[minLevel, maxLevel]的特征点
+ * @brief 找到在 以x,y为中心,半径为r的圆形内且金字塔层级在[minLevel, maxLevel]的一系列特征点
  * 
  * @param[in] x                     特征点坐标x
  * @param[in] y                     特征点坐标y

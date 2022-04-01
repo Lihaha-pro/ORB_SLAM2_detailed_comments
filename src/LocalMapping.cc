@@ -91,7 +91,7 @@ void LocalMapping::Run()
             ProcessNewKeyFrame();
 
             // Check recent MapPoints
-            // Step 3 根据地图点的观测情况剔除质量不好的地图点
+            // Step 3 根据地图点的观测情况剔除质量不好的地图点，以及保留较好的地图点
             MapPointCulling();
 
             // Triangulate new MapPoints
@@ -211,7 +211,7 @@ void LocalMapping::ProcessNewKeyFrame()
             {
                 if(!pMP->IsInKeyFrame(mpCurrentKeyFrame))
                 {
-                    // 如果地图点不是来自当前帧的观测（比如来自局部地图点），为当前地图点添加观测
+                    // 如果地图点不是来自当前帧的观测（比如来自局部地图点），为当前地图点添加观测，//llh也就是该地图点能被当前关键帧观测到，以及在当前帧中对应的ID
                     pMP->AddObservation(mpCurrentKeyFrame, i);
                     // 获得该点的平均观测方向和观测距离范围
                     pMP->UpdateNormalAndDepth();
@@ -373,12 +373,12 @@ void LocalMapping::CreateNewMapPoints()
         }
 
         // Compute Fundamental Matrix
-        // Step 4：根据两个关键帧的位姿计算它们之间的基础矩阵
+        // Step 4：根据两个关键帧的位姿计算它们之间的基础矩阵F
         cv::Mat F12 = ComputeF12(mpCurrentKeyFrame,pKF2);
 
         // Search matches that fullfil epipolar constraint
         // Step 5：通过词袋对两关键帧的未匹配的特征点快速匹配，用极线约束抑制离群点，生成新的匹配点对
-        vector<pair<size_t,size_t> > vMatchedIndices;
+        vector<pair<size_t,size_t> > vMatchedIndices;//存储当前关键帧和某关键帧的特征匹配，分别是两关键帧匹配特征点的id
         matcher.SearchForTriangulation(mpCurrentKeyFrame,pKF2,F12,vMatchedIndices,false);
 
         cv::Mat Rcw2 = pKF2->GetRotation();
@@ -749,12 +749,12 @@ cv::Mat LocalMapping::ComputeF12(KeyFrame *&pKF1, KeyFrame *&pKF2)
 
     cv::Mat R12 = R1w*R2w.t();
     
-    cv::Mat t12 = -R1w*R2w.t()*t2w+t1w;
+    cv::Mat t12 = -R1w*R2w.t()*t2w+t1w;//llh：这里就是计算两个相机光心向量的方法，自己画画就出来了
 
     // 得到 t12 的反对称矩阵
     cv::Mat t12x = SkewSymmetricMatrix(t12);
 
-    const cv::Mat &K1 = pKF1->mK;
+    const cv::Mat &K1 = pKF1->mK;//?为啥不同相机的内参矩阵不一样？
     const cv::Mat &K2 = pKF2->mK;
 
     // Essential Matrix: t12叉乘R12

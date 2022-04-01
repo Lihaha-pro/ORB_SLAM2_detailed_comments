@@ -614,7 +614,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
         int bestDist2 = INT_MAX;    //次佳描述子匹配距离
         int bestIdx2 = -1;          //最佳候选特征点在F2中的index
 
-        // Step 3 遍历搜索搜索窗口中的所有潜在的匹配候选点，找到最优的和次优的
+        // Step 3 遍历搜索搜索窗口中的所有潜在的匹配候选点，找到最优的和次优的（优劣依据为描述子距离）
         for(vector<size_t>::iterator vit=vIndices2.begin(); vit!=vIndices2.end(); vit++)
         {
             size_t i2 = *vit;
@@ -661,7 +661,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
                 // Step 5 计算匹配点旋转角度差所在的直方图
                 if(mbCheckOrientation)
                 {
-                    // 计算匹配特征点的角度差，这里单位是角度°，不是弧度
+                    // 计算匹配特征点的角度差，这里单位是角度°，不是弧度，用于后边角度筛选
                     float rot = F1.mvKeysUn[i1].angle-F2.mvKeysUn[bestIdx2].angle;
                     if(rot<0.0)
                         rot+=360.0f;
@@ -710,7 +710,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
     // Step 7 将最后通过筛选的匹配好的特征点保存到vbPrevMatched
     for(size_t i1=0, iend1=vnMatches12.size(); i1<iend1; i1++)
         if(vnMatches12[i1]>=0)
-            vbPrevMatched[i1]=F2.mvKeysUn[vnMatches12[i1]].pt;
+            vbPrevMatched[i1]=F2.mvKeysUn[vnMatches12[i1]].pt;///这里就是以参考帧特征点索引为基准，对应保存内容就是当前帧中的匹配特征点坐标
 
     return nmatches;
 }

@@ -30,7 +30,7 @@
 #include"System.h"
 
 using namespace std;
-
+#define COMPILEDWITHC11 1;
 /**
  * @brief 获取图像序列中每一张图像的访问路径和时间戳
  * @param[in]  strSequence              图像序列的存放路径
@@ -68,13 +68,13 @@ int main(int argc, char **argv)
     cout << "Start processing sequence ..." << endl;
     cout << "Images in the sequence: " << nImages << endl << endl;
 
-    // Main loop
+    //llh Main loop
     cv::Mat im;
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
         im = cv::imread(vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
-        double tframe = vTimestamps[ni];
+        double tframe = vTimestamps[ni];//当前图片时间戳
 
         if(im.empty())
         {
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
             return 1;
         }
 
-#ifdef COMPILEDWITHC11
+#ifdef COMPILEDWITHC11//再报错，直接在上边定义一下的
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
         std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
