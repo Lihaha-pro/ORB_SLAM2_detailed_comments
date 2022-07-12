@@ -70,10 +70,10 @@ int main(int argc, char **argv)
 
     //llh Main loop
     cv::Mat im;
-    for(int ni=0; ni<nImages; ni++)
+    for(int ni = 0; ni < nImages; ni++)
     {
         // Read image from file
-        im = cv::imread(vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(vstrImageFilenames[ni], CV_LOAD_IMAGE_UNCHANGED);
         double tframe = vTimestamps[ni];//当前图片时间戳
 
         if(im.empty())
